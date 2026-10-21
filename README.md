@@ -40,6 +40,12 @@
 | 2 | `docker exec -it spark python spark_clean_job.py` | Cleans the data into `transactions_cleaned` |
 | 3 | `python publish_outbox.py` | Sends the run message to Kafka |
 | 4 | `python event_consumer.py` | Receives and checks the message (Ctrl + C to stop) |
+| 5 | `docker exec -it spark python build_features.py` | Builds the feature table `features_account_month` (+ Parquet in `output/`) |
+
+Scale test (5x data, saves to `features_account_month_x5`):
+```
+docker exec -it spark python build_features_x5.py
+```
 
 All steps are safe to run again.
 
@@ -49,4 +55,4 @@ All steps are safe to run again.
 python -m pytest
 ```
 
-Run the pipeline first (steps 1 to 3). The tests read the results from Postgres.
+Run the pipeline first (steps 1 to 5). The tests read the results from Postgres.
