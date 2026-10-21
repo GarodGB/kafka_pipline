@@ -6,3 +6,4 @@ logs/
 .pytest_cache/
 _old/
 .git_old/
+output/
