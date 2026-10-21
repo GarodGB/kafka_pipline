@@ -1,5 +1,5 @@
 {
-  "config_version": "1.0",
+  "config_version": "1.1",
 
   "source": {
     "excel_file": "data/synthetic_dirty_transactions_v4.xlsx"
@@ -11,8 +11,8 @@
       "yyyy-MM-dd", "dd/MM/yyyy", "MM-dd-yyyy", "dd-MMM-yy"
     ],
     "min_year": 2000,
-    "window_start": "2022-03-01",
-    "window_end": "2022-09-30",
+    "window_end": "today",
+    "max_age_months": 60,
     "max_settle_lag_days": 5
   },
 
@@ -73,7 +73,6 @@
     "partitions": 1,
     "retention_days": 7
   },
-
 
   "features": {
     "spend_groups": {

@@ -263,10 +263,13 @@ def bad(condition):
     return F.sum(F.coalesce(condition, F.lit(True)).cast("int"))
 
 txn_day = F.to_date("txn_date_clean")
+# date window: "today" = automatic (no future dates, nothing older than max_age_months); or a fixed date
+window_end = F.current_date() if d["window_end"] == "today" else F.lit(d["window_end"]).cast("date")
+window_start = F.add_months(window_end, -d["max_age_months"])
 checks = df.select(
     bad(F.col("txn_id").isNull()).alias("null_txn_id"),
     bad(~F.col("account_id").rlike("^[0-9]{9}$")).alias("bad_account_id"),
-    bad((txn_day < F.lit(d["window_start"])) | (txn_day > F.lit(d["window_end"]))).alias("date_outside_window"),
+    bad((txn_day < window_start) | (txn_day > window_end)).alias("date_outside_window"),
     bad(F.col("txn_date_clean").isNull()).alias("missing_txn_date"),
     bad(F.col("txn_amount_clean").isNull()).alias("missing_txn_amount"),
     bad(F.col("billing_amount_clean").isNull()).alias("missing_billing_amount"),
