@@ -148,7 +148,6 @@ PAST = ["balance_lag1", "balance_lag2", "balance_lag3", "balance_mean_3m", "bala
         "spend_food_lag1", "spend_travel_lag1", "spend_shopping_lag1", "spend_bills_lag1",
         "spend_health_education_lag1", "spend_cash_transfers_lag1", "spend_other_lag1"]
 CALENDAR = ["month_of_year", "days_in_month"]
-
 features = monthly.select(KEYS + PAST + CALENDAR)
 features = timed("6-9 balance + lags + calendar", features)        # NEW (profiling)
 print("feature table:", len(features.columns), "columns")
@@ -162,6 +161,12 @@ features = features.orderBy("account_id", "month")
 
 features.write.mode("overwrite").parquet("output/features_account_month.parquet")
 print("saved: Postgres features_account_month + output/features_account_month.parquet")
+
+# 10b. target for Stage 5: balance at the END of each month (kept in its own table, never a feature)
+targets = monthly.select("account_id", "month", F.col("balance").alias("target_balance"))
+(targets.write.mode("overwrite").option("truncate", "true")
+    .jdbc(JDBC_URL, "targets_account_month", properties=JDBC_PROPS))
+print("saved: Postgres targets_account_month")
 timings["10 save"] = round(time.time() - start, 2)               # NEW (profiling)
 print(f"[time] 10 save: {timings['10 save']}s")
 
